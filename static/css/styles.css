@@ -9,7 +9,7 @@
 /* Main Layout */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: linear-gradient(135deg, #b4a752 0%, #7c9988 100%);
     min-height: 100vh;
     padding: 20px;
 }
@@ -17,7 +17,7 @@ body {
 .container {
     max-width: 1200px;
     margin: 0 auto;
-    background: white;
+    background: antiquewhite;
     border-radius: 20px;
     box-shadow: 0 20px 40px rgba(0,0,0,0.1);
     overflow: hidden;
@@ -25,8 +25,8 @@ body {
 
 /* Header Styles */
 .header {
-    background: linear-gradient(135deg, #ff7b7b 0%, #667eea 100%);
-    color: white;
+    background: linear-gradient(135deg, #83a18c 0%, #d8cfc4 100%);
+    color: antiquewhite;
     padding: 30px;
     text-align: center;
 }
@@ -63,13 +63,13 @@ body {
 }
 
 .upload-area:hover {
-    border-color: #667eea;
+    border-color: #d8cfc4;
     background: #f0f7ff;
     transform: translateY(-2px);
 }
 
 .upload-area.dragover {
-    border-color: #ff7b7b;
+    border-color: #a59aa6;
     background: #fff0f0;
     transform: scale(1.02);
 }
@@ -82,7 +82,7 @@ body {
 }
 
 .upload-area:hover .upload-icon {
-    color: #667eea;
+    color: #83a18c;
     transform: scale(1.1);
 }
 
@@ -104,8 +104,8 @@ body {
 
 /* Buttons */
 .analyze-btn {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
+    background: linear-gradient(135deg, #8a83a1 0%, #bcb6a8 100%);
+    color: antiquewhite;
     border: none;
     padding: 15px 40px;
     border-radius: 25px;
@@ -142,7 +142,7 @@ body {
 
 .spinner {
     border: 4px solid #f3f3f3;
-    border-top: 4px solid #667eea;
+    border-top: 4px solid #83a18c;
     border-radius: 50%;
     width: 50px;
     height: 50px;
@@ -161,8 +161,8 @@ body {
 }
 
 .results-header {
-    background: linear-gradient(135deg, #ff7b7b 0%, #667eea 100%);
-    color: white;
+    background: linear-gradient(135deg, #83a18c 0%, #7c9988 100%);
+    color: antiquewhite;
     padding: 20px;
     border-radius: 10px;
     margin-bottom: 30px;
@@ -217,7 +217,7 @@ body {
 }
 
 .palette-card {
-    background: white;
+    background: antiquewhite;
     border: 1px solid #eee;
     border-radius: 15px;
     padding: 25px;
@@ -252,9 +252,9 @@ body {
     font-style: italic;
     line-height: 1.4;
     padding: 10px;
-    background: #f8f9fa;
+    background: antiqueantiquewhite;
     border-radius: 8px;
-    border-left: 4px solid #667eea;
+    border-left: 4px solid #b4a752;
 }
 
 /* Color List */
@@ -271,7 +271,7 @@ body {
 }
 
 .color-item:hover {
-    background: #f8f9fa;
+    background: antiqueantiquewhite;
     border-radius: 8px;
     padding-left: 10px;
     padding-right: 10px;
@@ -286,7 +286,7 @@ body {
     height: 45px;
     border-radius: 10px;
     margin-right: 15px;
-    border: 3px solid white;
+    border: 3px solid antiquewhite;
     box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     transition: transform 0.2s ease;
 }
@@ -330,7 +330,7 @@ body {
 
 .badge.pink {
     background: linear-gradient(135deg, #ffe4e1 0%, #ffc0cb 100%);
-    color: #d63384;
+    color: #f5c6cb;
 }
 
 .badge.gray {
@@ -342,7 +342,7 @@ body {
 .copy-palette {
     margin-top: 20px;
     padding: 15px;
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: linear-gradient(135deg, antiquewhite 0%, #e9ecef 100%);
     border-radius: 10px;
     border: 1px solid #dee2e6;
 }
@@ -364,13 +364,13 @@ body {
     border-radius: 8px;
     font-family: 'Courier New', monospace;
     font-size: 0.9em;
-    background: white;
+    background: antiquewhite;
     transition: border-color 0.3s ease;
 }
 
 .copy-palette input:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: #a59aa6;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
 }
 
@@ -386,7 +386,7 @@ body {
     border-radius: 10px;
     margin-top: 20px;
     display: none;
-    border-left: 4px solid #dc3545;
+    border-left: 4px solid #b4a752;
 }
 
 /* New Analysis Button */
@@ -399,7 +399,7 @@ body {
 
 .new-analysis button {
     background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
-    color: white;
+    color: antiquewhite;
     border: none;
     padding: 12px 30px;
     border-radius: 20px;
