@@ -152,10 +152,27 @@
         }
         
         .image-info {
-            background: #23313f;
+            background: #f8f9fa;
             padding: 20px;
             border-radius: 10px;
             margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .image-preview {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            border: 2px solid #dee2e6;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .image-details {
+            flex-grow: 1;
+            color: #495057;
         }
         
         .visualization {
@@ -171,23 +188,23 @@
         
         .palette-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-            gap: 25px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
             margin-top: 30px;
         }
         
         .palette-card {
             background: white;
             border: 1px solid #eee;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            border-radius: 8px;
+            padding: 10px;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.04);
         }
         
         .palette-title {
-            font-size: 1.3em;
+            font-size: 0.9em;
             font-weight: bold;
-            margin-bottom: 20px;
+            margin-bottom: 6px;
             color: #333;
             display: flex;
             align-items: center;
@@ -195,15 +212,21 @@
         
         .palette-title::before {
             content: "🔬";
-            margin-right: 10px;
+            margin-right: 6px;
+            font-size: 0.8em;
         }
         
         .method-description {
-            font-size: 0.85em;
+            font-size: 0.65em;
             color: #666;
-            margin-bottom: 15px;
+            margin-bottom: 8px;
             font-style: italic;
-            line-height: 1.4;
+            line-height: 1.2;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         
         .color-list {
@@ -213,7 +236,7 @@
         .color-item {
             display: flex;
             align-items: center;
-            padding: 12px 0;
+            padding: 4px 0;
             border-bottom: 1px solid #f0f0f0;
         }
         
@@ -222,12 +245,12 @@
         }
         
         .color-swatch {
-            width: 40px;
-            height: 40px;
-            border-radius: 8px;
-            margin-right: 15px;
-            border: 2px solid white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            margin-right: 6px;
+            border: 1px solid white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
         }
         
         .color-info {
@@ -237,25 +260,25 @@
         .color-hex {
             font-weight: bold;
             font-family: 'Courier New', monospace;
-            font-size: 1.1em;
+            font-size: 0.7em;
         }
         
         .color-name {
             color: #666;
-            font-size: 0.9em;
-            margin-top: 2px;
+            font-size: 0.65em;
+            margin-top: 1px;
         }
         
         .color-badges {
             display: flex;
-            gap: 5px;
-            margin-top: 5px;
+            gap: 3px;
+            margin-top: 3px;
         }
         
         .badge {
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-size: 0.7em;
+            padding: 1px 4px;
+            border-radius: 6px;
+            font-size: 0.55em;
             font-weight: bold;
         }
         
@@ -267,32 +290,6 @@
         .badge.gray {
             background: #e9ecef;
             color: #6c757d;
-        }
-        
-        .copy-palette {
-            margin-top: 20px;
-            padding: 10px;
-            background: #f8f9fa;
-            border-radius: 8px;
-            border: 1px solid #dee2e6;
-        }
-        
-        .copy-palette label {
-            display: block;
-            font-weight: bold;
-            margin-bottom: 5px;
-            font-size: 0.9em;
-            color: #495057;
-        }
-        
-        .copy-palette input {
-            width: 100%;
-            padding: 8px;
-            border: 1px solid #ced4da;
-            border-radius: 4px;
-            font-family: 'Courier New', monospace;
-            font-size: 0.9em;
-            background: white;
         }
         
         .error {
@@ -324,9 +321,17 @@
             transform: translateY(-1px);
         }
         
+        @media (max-width: 1024px) {
+            .palette-details {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 8px;
+            }
+        }
+        
         @media (max-width: 768px) {
             .palette-details {
                 grid-template-columns: 1fr;
+                gap: 8px;
             }
             
             .header h1 {
@@ -465,12 +470,22 @@
         }
         
         function displayResults(data) {
-            // Update image info
+            // Create image preview
+            const imagePreview = document.createElement('img');
+            imagePreview.className = 'image-preview';
+            imagePreview.src = URL.createObjectURL(selectedFile);
+            
+            // Update image info with preview
             document.getElementById('imageInfo').innerHTML = `
-                <strong>📄 File:</strong> ${data.image_info.filename} &nbsp;&nbsp;
-                <strong>📐 Size:</strong> ${data.image_info.size} &nbsp;&nbsp;
-                <strong>🎨 Mode:</strong> ${data.image_info.mode}
+                <div class="image-details">
+                    <strong>📄 File:</strong> ${data.image_info.filename}<br>
+                    <strong>📐 Size:</strong> ${data.image_info.size}<br>
+                    <strong>🎨 Mode:</strong> ${data.image_info.mode}
+                </div>
             `;
+            
+            // Insert image preview at the beginning
+            document.getElementById('imageInfo').insertBefore(imagePreview, document.getElementById('imageInfo').firstChild);
             
             // Update visualization
             document.getElementById('visualizationImg').src = data.visualization;
@@ -492,10 +507,6 @@
             const card = document.createElement('div');
             card.className = 'palette-card';
             
-            const hexColors = colors.map(c => c.hex);
-            const cssColors = hexColors.join(' ');
-            const arrayColors = hexColors.map(h => `"${h}"`).join(', ');
-            
             card.innerHTML = `
                 <div class="palette-title">${name}</div>
                 <div class="method-description">${description || ''}</div>
@@ -514,14 +525,6 @@
                         </li>
                     `).join('')}
                 </ul>
-                <div class="copy-palette">
-                    <label>CSS Colors:</label>
-                    <input type="text" value="${cssColors}" readonly onclick="this.select()">
-                </div>
-                <div class="copy-palette">
-                    <label>Array Format:</label>
-                    <input type="text" value="[${arrayColors}]" readonly onclick="this.select()">
-                </div>
             `;
             
             return card;
