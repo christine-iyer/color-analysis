@@ -210,12 +210,14 @@
             position: relative;
             overflow: hidden;
             border-radius: 12px;
+            touch-action: pan-y;
         }
         
         .carousel-track {
             display: flex;
             transition: transform 0.3s ease;
             gap: 15px;
+            will-change: transform;
         }
         
         .palette-card {
@@ -226,6 +228,52 @@
             box-shadow: 0 2px 6px rgba(0,0,0,0.04);
             flex: 0 0 calc(25% - 11.25px);
             min-height: 280px;
+        }
+        
+        /* Mobile-first persistent image display */
+        .mobile-image-reference {
+            display: none;
+            position: sticky;
+            top: 10px;
+            z-index: 10;
+            background: white;
+            border-radius: 12px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border: 2px solid #f0f0f0;
+        }
+        
+        .mobile-image-reference img {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 2px solid #dee2e6;
+        }
+        
+        .mobile-image-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .mobile-image-details {
+            flex-grow: 1;
+            font-size: 0.85em;
+            color: #666;
+        }
+        
+        .swipe-indicator {
+            display: none;
+            text-align: center;
+            padding: 10px;
+            background: rgba(181, 203, 146, 0.1);
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.8em;
+            color: #666;
         }
         
         .carousel-nav {
@@ -404,12 +452,40 @@
         }
         
         @media (max-width: 768px) {
+            .mobile-image-reference {
+                display: block;
+            }
+            
+            .swipe-indicator {
+                display: block;
+            }
+            
+            .carousel-container {
+                overflow-x: hidden;
+                touch-action: pan-x;
+            }
+            
             .palette-card {
-                flex: 0 0 calc(100% - 0px);
+                flex: 0 0 100%;
+                margin: 0;
+                min-height: auto;
             }
             
             .carousel-track {
-                gap: 10px;
+                gap: 0;
+            }
+            
+            .carousel-nav {
+                display: none;
+            }
+            
+            .carousel-indicators {
+                margin-top: 20px;
+            }
+            
+            .indicator {
+                width: 12px;
+                height: 12px;
             }
             
             .header h1 {
@@ -433,17 +509,17 @@
             <div class="upload-section" id="uploadSection">            <div class="upload-area" onclick="document.getElementById('imageInput').click()">
                 <div class="upload-icon">📁</div>
                 <div class="upload-text">Click to select an image or drag & drop</div>
-                <div class="upload-subtext">Supports JPG, PNG, GIF, WebP (max 16MB) • 8 AI models will analyze your image</div>
+                <div class="upload-subtext">Supports JPG, PNG, GIF, WebP (max 16MB) • 10 AI models will analyze your image</div>
             </div>
                 <input type="file" id="imageInput" accept="image/*">
                 <button class="analyze-btn" id="analyzeBtn" onclick="analyzeImage()">
-                    � Analyze with 8 AI Models
+                    � Analyze with 10 AI Models
                 </button>
             </div>
             
             <div class="loading" id="loading">
                 <div class="spinner"></div>
-                <p>Analyzing your image using 8 different AI models and algorithms...</p>
+                <p>Analyzing your image using 10 different AI models and algorithms...</p>
             </div>
             
             <div class="error" id="error"></div>
@@ -451,17 +527,25 @@
             <div class="results" id="results">
                 <div class="results-header">
                     <h2>� Advanced Color Analysis Results</h2>
-                    <p>Your image has been analyzed using 8 different algorithms and models</p>
+                    <p>Your image has been analyzed using 10 different algorithms and models</p>
                     <div class="image-info" id="imageInfo"></div>
                 </div>
                 
                 <div class="visualization">
                     <h3>🖼️ Multi-Algorithm Comparison</h3>
-                    <p>All 8 methods compared side-by-side with your original image</p>
+                    <p>All 10 methods compared side-by-side with your original image</p>
                     <img id="visualizationImg" alt="Color palette comparison">
                 </div>
                 
                 <div class="palette-details" id="paletteDetails">
+                    <div class="mobile-image-reference" id="mobileImageRef">
+                        <div class="mobile-image-info">
+                            <!-- Mobile image preview will be inserted here -->
+                        </div>
+                    </div>
+                    <div class="swipe-indicator">
+                        👈 Swipe left/right to explore all 10 AI models 👉
+                    </div>
                     <div class="carousel-container" id="carouselContainer">
                         <div class="carousel-track" id="carouselTrack">
                             <!-- Palette cards will be inserted here -->
@@ -616,7 +700,7 @@
         // Update cards per view based on screen size
         function updateCardsPerView() {
             if (window.innerWidth <= 768) {
-                cardsPerView = 1;
+                cardsPerView = 1; // Always single card on mobile for true swiping
             } else if (window.innerWidth <= 1024) {
                 cardsPerView = 2;
             } else {
@@ -627,9 +711,22 @@
         // Initialize carousel
         function initCarousel() {
             updateCardsPerView();
-            totalSlides = Math.ceil(8 / cardsPerView);
+            totalSlides = Math.ceil(10 / cardsPerView);
             createIndicators();
             updateCarousel();
+            
+            // Update indicators to show current model number on mobile
+            if (window.innerWidth <= 768) {
+                updateMobileIndicators();
+            }
+        }
+        
+        // Mobile-specific indicator updates
+        function updateMobileIndicators() {
+            const indicators = document.querySelectorAll('.indicator');
+            indicators.forEach((indicator, index) => {
+                indicator.title = `Model ${index + 1} of 10`;
+            });
         }
         
         // Create indicator dots
@@ -667,8 +764,16 @@
         // Update carousel position and buttons
         function updateCarousel() {
             const track = document.getElementById('carouselTrack');
-            const translateX = -currentSlide * (100 / totalSlides);
-            track.style.transform = `translateX(${translateX}%)`;
+            
+            if (window.innerWidth <= 768) {
+                // Mobile: Slide one card at a time
+                const translateX = -currentSlide * 100;
+                track.style.transform = `translateX(${translateX}%)`;
+            } else {
+                // Desktop/Tablet: Original behavior
+                const translateX = -currentSlide * (100 / totalSlides);
+                track.style.transform = `translateX(${translateX}%)`;
+            }
             
             // Update indicators
             document.querySelectorAll('.indicator').forEach((indicator, index) => {
@@ -678,57 +783,98 @@
             // Update navigation buttons
             document.getElementById('prevBtn').disabled = false;
             document.getElementById('nextBtn').disabled = false;
+            
+            // Update mobile swipe indicator text
+            if (window.innerWidth <= 768) {
+                const swipeIndicator = document.querySelector('.swipe-indicator');
+                if (swipeIndicator) {
+                    swipeIndicator.textContent = `Model ${currentSlide + 1} of 10 - Swipe to explore 👈👉`;
+                }
+            }
         }
         
-        // Touch/swipe support
+        // Touch/swipe support - Enhanced for mobile
         let startX = 0;
         let currentX = 0;
         let isDragging = false;
+        let startTime = 0;
         
         function addSwipeSupport() {
             const carousel = document.getElementById('carouselContainer');
             
+            // Touch events for mobile
             carousel.addEventListener('touchstart', (e) => {
                 startX = e.touches[0].clientX;
+                startTime = Date.now();
                 isDragging = true;
-            });
+                
+                // Prevent default to stop scrolling
+                if (window.innerWidth <= 768) {
+                    e.preventDefault();
+                }
+            }, { passive: false });
             
             carousel.addEventListener('touchmove', (e) => {
                 if (!isDragging) return;
+                
                 currentX = e.touches[0].clientX;
-            });
+                
+                // Show visual feedback on mobile
+                if (window.innerWidth <= 768) {
+                    const diffX = currentX - startX;
+                    const track = document.getElementById('carouselTrack');
+                    const currentTransform = -currentSlide * 100;
+                    const dragAmount = (diffX / carousel.offsetWidth) * 100;
+                    track.style.transform = `translateX(${currentTransform + dragAmount}%)`;
+                    e.preventDefault();
+                }
+            }, { passive: false });
             
-            carousel.addEventListener('touchend', () => {
+            carousel.addEventListener('touchend', (e) => {
                 if (!isDragging) return;
                 
                 const diffX = startX - currentX;
-                const threshold = 50;
+                const diffTime = Date.now() - startTime;
+                const velocity = Math.abs(diffX) / diffTime;
                 
-                if (Math.abs(diffX) > threshold) {
-                    if (diffX > 0) {
+                // More sensitive threshold for mobile
+                const threshold = window.innerWidth <= 768 ? 30 : 50;
+                const velocityThreshold = 0.3;
+                
+                if (Math.abs(diffX) > threshold || velocity > velocityThreshold) {
+                    if (diffX > 0 && currentSlide < totalSlides - 1) {
                         moveCarousel(1); // Swipe left - next
-                    } else {
+                    } else if (diffX < 0 && currentSlide > 0) {
                         moveCarousel(-1); // Swipe right - previous
+                    } else {
+                        // Snap back if at boundaries
+                        updateCarousel();
                     }
+                } else {
+                    // Snap back if not enough movement
+                    updateCarousel();
                 }
                 
                 isDragging = false;
-            });
+                e.preventDefault();
+            }, { passive: false });
             
-            // Mouse support for desktop
+            // Mouse support for desktop (existing functionality)
             carousel.addEventListener('mousedown', (e) => {
+                if (window.innerWidth <= 768) return; // Skip mouse events on mobile
+                
                 startX = e.clientX;
                 isDragging = true;
                 e.preventDefault();
             });
             
             carousel.addEventListener('mousemove', (e) => {
-                if (!isDragging) return;
+                if (!isDragging || window.innerWidth <= 768) return;
                 currentX = e.clientX;
             });
             
             carousel.addEventListener('mouseup', () => {
-                if (!isDragging) return;
+                if (!isDragging || window.innerWidth <= 768) return;
                 
                 const diffX = startX - currentX;
                 const threshold = 50;
@@ -845,6 +991,24 @@
             // Insert image preview at the beginning
             document.getElementById('imageInfo').insertBefore(imagePreview, document.getElementById('imageInfo').firstChild);
             
+            // Create mobile image reference
+            const mobileImageRef = document.querySelector('.mobile-image-info');
+            if (mobileImageRef) {
+                const mobileImage = document.createElement('img');
+                mobileImage.src = URL.createObjectURL(selectedFile);
+                
+                const mobileDetails = document.createElement('div');
+                mobileDetails.className = 'mobile-image-details';
+                mobileDetails.innerHTML = `
+                    <strong>${data.image_info.filename}</strong><br>
+                    <span>Analyzing with 8 AI models</span>
+                `;
+                
+                mobileImageRef.innerHTML = '';
+                mobileImageRef.appendChild(mobileImage);
+                mobileImageRef.appendChild(mobileDetails);
+            }
+            
             // Update visualization
             document.getElementById('visualizationImg').src = data.visualization;
             
@@ -920,6 +1084,12 @@
             document.getElementById('carouselIndicators').innerHTML = '';
             document.getElementById('imageInfo').innerHTML = '';
             document.getElementById('visualizationImg').src = '';
+            
+            // Clear mobile image reference
+            const mobileImageRef = document.querySelector('.mobile-image-info');
+            if (mobileImageRef) {
+                mobileImageRef.innerHTML = '';
+            }
             
             // Reset carousel state
             const track = document.getElementById('carouselTrack');

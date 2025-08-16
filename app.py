@@ -77,6 +77,30 @@ class WebColorAnalyzer:
         
         return is_pink_hue and has_red_dominance and sufficient_brightness
     
+    def is_excluded_color(self, rgb_color):
+        """Check if color should be excluded (black, brown, or very dark)"""
+        # First check if it's very dark (this catches most blacks)
+        if self.is_dark_color(rgb_color, threshold=40):
+            return True
+        
+        # Get the color name and check if it's black or brown
+        color_name = self.get_color_name(rgb_color)
+        if color_name in ['black', 'brown']:
+            return True
+        
+        # Additional brown detection - browns often have low brightness and red dominance
+        r, g, b = rgb_color
+        brightness = (r + g + b) / 3
+        
+        # Check for brown characteristics: low brightness, red dominance, muted colors
+        if brightness < 100:  # Generally dark
+            if r > g and r > b:  # Red is dominant
+                if g > 20 and b > 10:  # Not pure red, has some green/blue (brown-ish)
+                    if abs(g - b) < 50:  # Green and blue are relatively close (muted)
+                        return True
+        
+        return False
+    
     def extract_palette_basic(self, n_colors=5):
         """Basic K-means extraction (original method)"""
         resized = self.image.resize((150, int(150 * self.image.height / self.image.width)))
@@ -232,12 +256,12 @@ class WebColorAnalyzer:
         return colors[:n_colors]
     
     def extract_palette_filtered(self, n_colors=5):
-        """Filtered extraction (excludes grays and darks)"""
-        colors = self.extract_palette_basic(n_colors * 2)  # Get more colors initially
+        """Filtered extraction (excludes grays, darks, blacks, and browns)"""
+        colors = self.extract_palette_basic(n_colors * 3)  # Get more colors initially
         
         filtered = []
         for color in colors:
-            if not self.is_grayscale_color(color) and not self.is_dark_color(color):
+            if not self.is_grayscale_color(color) and not self.is_excluded_color(color):
                 filtered.append(color)
         
         # Remove duplicates
@@ -271,6 +295,221 @@ class WebColorAnalyzer:
                     filtered.append(pink)
         
         return filtered[:n_colors]
+    
+    def extract_palette_no_black_brown(self, n_colors=5):
+        """Enhanced filtering that specifically excludes black and brown colors"""
+        # Start with multiple extraction methods to get diverse colors
+        all_colors = []
+        
+        try:
+            # Get colors from multiple methods
+            basic_colors = self.extract_palette_basic(n_colors)
+            gmm_colors = self.extract_palette_gaussian_mixture(n_colors)
+            mbk_colors = self.extract_palette_minibatch_kmeans(n_colors)
+            
+            all_colors.extend(basic_colors)
+            all_colors.extend(gmm_colors)
+            all_colors.extend(mbk_colors)
+        except:
+            # Fallback to basic if others fail
+            all_colors = self.extract_palette_basic(n_colors * 3)
+        
+        # Filter out excluded colors
+        filtered = []
+        for color in all_colors:
+            if not self.is_excluded_color(color) and not self.is_grayscale_color(color):
+                filtered.append(color)
+        
+        # Remove duplicates
+        unique_colors = []
+        for color in filtered:
+            is_duplicate = False
+            for existing in unique_colors:
+                if all(abs(color[i] - existing[i]) <= 30 for i in range(3)):
+                    is_duplicate = True
+                    break
+            if not is_duplicate:
+                unique_colors.append(color)
+        
+        # If we don't have enough colors, try to find brighter variants
+        if len(unique_colors) < n_colors:
+            # Add some vibrant default colors if needed
+            vibrant_colors = [
+                (255, 182, 193),  # Light pink
+                (173, 216, 230),  # Light blue
+                (152, 251, 152),  # Light green
+                (255, 218, 185),  # Peach
+                (221, 160, 221),  # Plum
+                (255, 255, 224),  # Light yellow
+                (250, 128, 114),  # Salmon
+                (147, 112, 219),  # Medium purple
+            ]
+            
+            for vibrant_color in vibrant_colors:
+                if len(unique_colors) >= n_colors:
+                    break
+                
+                # Check if it's not already similar to existing colors
+                is_duplicate = False
+                for existing in unique_colors:
+                    if all(abs(vibrant_color[i] - existing[i]) <= 30 for i in range(3)):
+                        is_duplicate = True
+                        break
+                
+                if not is_duplicate and not self.is_excluded_color(vibrant_color):
+                    unique_colors.append(vibrant_color)
+        
+        return unique_colors[:n_colors]
+    
+    def extract_palette_grid_sampling(self, n_colors=5, grid_size=20):
+        """Grid-based random sampling with duplicate elimination"""
+        try:
+            img_array = np.array(self.image)
+            height, width = img_array.shape[:2]
+            
+            # Ensure grid size is reasonable
+            grid_size = min(grid_size, min(height, width) // 2)
+            if grid_size < 2:
+                # Fallback to basic K-means if image is too small
+                return self.extract_palette_basic(n_colors)
+            
+            # Calculate grid cell dimensions
+            cell_height = max(1, height // grid_size)
+            cell_width = max(1, width // grid_size)
+            
+            sampled_colors = []
+            max_samples = grid_size * grid_size
+            
+            # Sample from each grid cell with error handling
+            for row in range(grid_size):
+                for col in range(grid_size):
+                    try:
+                        # Calculate cell boundaries
+                        y_start = row * cell_height
+                        y_end = min((row + 1) * cell_height, height)
+                        x_start = col * cell_width
+                        x_end = min((col + 1) * cell_width, width)
+                        
+                        # Skip if cell is too small
+                        if y_end <= y_start or x_end <= x_start:
+                            continue
+                        
+                        # Random sampling within the cell
+                        if y_end > y_start and x_end > x_start:
+                            rand_y = np.random.randint(y_start, y_end)
+                            rand_x = np.random.randint(x_start, x_end)
+                            
+                            # Ensure indices are within bounds
+                            rand_y = max(0, min(rand_y, height - 1))
+                            rand_x = max(0, min(rand_x, width - 1))
+                            
+                            pixel = img_array[rand_y, rand_x]
+                            if len(pixel) >= 3:  # Ensure RGB
+                                color = tuple(int(pixel[i]) for i in range(3))
+                                
+                                # Filter out excluded colors (dark, black, brown)
+                                if not self.is_excluded_color(color):
+                                    sampled_colors.append(color)
+                    
+                    except (ValueError, IndexError) as e:
+                        # Skip problematic cells
+                        continue
+            
+            # If we didn't get enough samples, fallback
+            if len(sampled_colors) < 3:
+                return self.extract_palette_basic(n_colors)
+            
+            # Remove near duplicates using vectorized operations
+            unique_colors = []
+            similarity_threshold = 30
+            
+            for color in sampled_colors:
+                is_duplicate = False
+                for existing in unique_colors:
+                    # Safe distance calculation
+                    try:
+                        r_diff = abs(int(color[0]) - int(existing[0]))
+                        g_diff = abs(int(color[1]) - int(existing[1]))
+                        b_diff = abs(int(color[2]) - int(existing[2]))
+                        distance = (r_diff**2 + g_diff**2 + b_diff**2)**0.5
+                        
+                        if distance < similarity_threshold:
+                            is_duplicate = True
+                            break
+                    except (TypeError, ValueError, OverflowError):
+                        # Skip problematic color comparisons
+                        break
+                
+                if not is_duplicate and len(unique_colors) < n_colors * 3:  # Limit to prevent memory issues
+                    unique_colors.append(color)
+            
+            # If we have enough unique colors, use K-means to cluster to final count
+            if len(unique_colors) >= n_colors:
+                try:
+                    color_array = np.array(unique_colors, dtype=np.float64)
+                    kmeans = KMeans(n_clusters=n_colors, random_state=42, n_init=10, max_iter=100)
+                    kmeans.fit(color_array)
+                    final_colors = kmeans.cluster_centers_.round(0).astype(int)
+                    
+                    # Ensure valid RGB values
+                    final_colors = np.clip(final_colors, 0, 255)
+                    return [tuple(int(c) for c in color) for color in final_colors]
+                except Exception as e:
+                    # Fallback: just return first n_colors unique colors
+                    return unique_colors[:n_colors]
+            
+            # If we have fewer colors than requested, pad carefully
+            attempts = 0
+            max_attempts = 10  # Prevent infinite loop
+            
+            while len(unique_colors) < n_colors and attempts < max_attempts:
+                try:
+                    basic_colors = self.extract_palette_basic(min(3, n_colors - len(unique_colors)))
+                    for color in basic_colors:
+                        if len(unique_colors) >= n_colors:
+                            break
+                        
+                        # Check if this color is already similar to existing ones
+                        is_duplicate = False
+                        for existing in unique_colors:
+                            try:
+                                r_diff = abs(int(color[0]) - int(existing[0]))
+                                g_diff = abs(int(color[1]) - int(existing[1]))
+                                b_diff = abs(int(color[2]) - int(existing[2]))
+                                distance = (r_diff**2 + g_diff**2 + b_diff**2)**0.5
+                                
+                                if distance < similarity_threshold:
+                                    is_duplicate = True
+                                    break
+                            except (TypeError, ValueError, OverflowError):
+                                break
+                        
+                        if not is_duplicate:
+                            unique_colors.append(color)
+                    
+                    attempts += 1
+                except Exception as e:
+                    break
+            
+            # Ensure we return exactly n_colors
+            result = unique_colors[:n_colors]
+            
+            # If still not enough, pad with safe defaults
+            while len(result) < n_colors:
+                default_colors = [(128, 128, 128), (255, 255, 255), (0, 0, 0), (255, 0, 0), (0, 255, 0)]
+                for default_color in default_colors:
+                    if len(result) < n_colors:
+                        result.append(default_color)
+                    else:
+                        break
+                break  # Prevent infinite loop
+            
+            return result[:n_colors]
+            
+        except Exception as e:
+            # Complete fallback to basic K-means if anything goes wrong
+            print(f"Grid sampling error: {e}")
+            return self.extract_palette_basic(n_colors)
     
     def rgb_to_hex(self, rgb_color):
         return "#{:02x}{:02x}{:02x}".format(rgb_color[0], rgb_color[1], rgb_color[2])
@@ -380,7 +619,9 @@ def analyze_image():
                 'OpenCV Quantization': analyzer.extract_palette_quantization,
                 'DBSCAN Clustering': analyzer.extract_palette_dbscan,
                 'Filtered (No Grays)': analyzer.extract_palette_filtered,
-                'Pink Enhanced': analyzer.extract_palette_pink_enhanced
+                'Pink Enhanced': analyzer.extract_palette_pink_enhanced,
+                'Grid Sampling': analyzer.extract_palette_grid_sampling,
+                'No Black/Brown': analyzer.extract_palette_no_black_brown
             }
             
             palettes = {}
@@ -412,8 +653,10 @@ def analyze_image():
                     'MiniBatch K-means': 'Faster K-means variant for large images',
                     'OpenCV Quantization': 'Computer vision approach with color reduction',
                     'DBSCAN Clustering': 'Density-based clustering, finds natural color groups',
-                    'Filtered (No Grays)': 'K-means with grayscale and dark color filtering',
-                    'Pink Enhanced': 'Filtered approach with manual pink tone additions'
+                    'Filtered (No Grays)': 'K-means with grayscale, dark, black, and brown filtering',
+                    'Pink Enhanced': 'Filtered approach with manual pink tone additions',
+                    'Grid Sampling': '20×20 grid random sampling with duplicate elimination and clustering',
+                    'No Black/Brown': 'Multi-method extraction specifically excluding black and brown colors'
                 }
             }
             
