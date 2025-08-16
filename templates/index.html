@@ -907,18 +907,50 @@
         }
         
         function resetAnalysis() {
+            // Clear all data variables
             selectedFile = null;
+            currentSlide = 0;
+            totalSlides = 0;
             
-            // Reset dynamic background
+            // Reset dynamic background and theming
             resetDynamicBackground();
             
+            // Clear all result containers
+            document.getElementById('carouselTrack').innerHTML = '';
+            document.getElementById('carouselIndicators').innerHTML = '';
+            document.getElementById('imageInfo').innerHTML = '';
+            document.getElementById('visualizationImg').src = '';
+            
+            // Reset carousel state
+            const track = document.getElementById('carouselTrack');
+            track.style.transform = 'translateX(0%)';
+            
+            // Clear any URL objects to prevent memory leaks
+            const existingPreviews = document.querySelectorAll('.image-preview');
+            existingPreviews.forEach(preview => {
+                if (preview.src && preview.src.startsWith('blob:')) {
+                    URL.revokeObjectURL(preview.src);
+                }
+            });
+            
+            // Reset UI state
             document.getElementById('uploadSection').style.display = 'block';
             document.getElementById('results').style.display = 'none';
             document.getElementById('error').style.display = 'none';
+            document.getElementById('loading').style.display = 'none';
             document.getElementById('analyzeBtn').style.display = 'none';
+            
+            // Reset upload area text
             document.querySelector('.upload-text').textContent = 'Click to select an image or drag & drop';
-            document.querySelector('.upload-subtext').textContent = 'Supports JPG, PNG, GIF, WebP (max 16MB)';
+            document.querySelector('.upload-subtext').textContent = 'Supports JPG, PNG, GIF, WebP (max 16MB) • 8 AI models will analyze your image';
+            
+            // Clear file input
             document.getElementById('imageInput').value = '';
+            
+            // Reset any drag states
+            document.querySelector('.upload-area').classList.remove('dragover');
+            
+            console.log('🔄 Analysis reset - all data cleared');
         }
     </script>
 </body>
