@@ -1,0 +1,461 @@
+/* Color Analysis App Styles */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Main Layout */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+    overflow: hidden;
+}
+
+/* Header Styles */
+.header {
+    background: linear-gradient(135deg, #ff7b7b 0%, #667eea 100%);
+    color: white;
+    padding: 30px;
+    text-align: center;
+}
+
+.header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+}
+
+.header p {
+    font-size: 1.1em;
+    opacity: 0.9;
+}
+
+/* Content Area */
+.content {
+    padding: 40px;
+}
+
+/* Upload Section */
+.upload-section {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.upload-area {
+    border: 3px dashed #ddd;
+    border-radius: 15px;
+    padding: 60px 20px;
+    background: #fafafa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.upload-area:hover {
+    border-color: #667eea;
+    background: #f0f7ff;
+    transform: translateY(-2px);
+}
+
+.upload-area.dragover {
+    border-color: #ff7b7b;
+    background: #fff0f0;
+    transform: scale(1.02);
+}
+
+.upload-icon {
+    font-size: 4em;
+    margin-bottom: 20px;
+    color: #ccc;
+    transition: all 0.3s ease;
+}
+
+.upload-area:hover .upload-icon {
+    color: #667eea;
+    transform: scale(1.1);
+}
+
+.upload-text {
+    font-size: 1.2em;
+    color: #666;
+    margin-bottom: 15px;
+    font-weight: 600;
+}
+
+.upload-subtext {
+    color: #999;
+    font-size: 0.9em;
+}
+
+#imageInput {
+    display: none;
+}
+
+/* Buttons */
+.analyze-btn {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 15px 40px;
+    border-radius: 25px;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 20px;
+    display: none;
+    font-weight: 600;
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.analyze-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 25px rgba(102, 126, 234, 0.4);
+}
+
+.analyze-btn:active {
+    transform: translateY(-1px);
+}
+
+.analyze-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Loading Animation */
+.loading {
+    display: none;
+    text-align: center;
+    padding: 40px;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Results Section */
+.results {
+    display: none;
+}
+
+.results-header {
+    background: linear-gradient(135deg, #ff7b7b 0%, #667eea 100%);
+    color: white;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.results-header h2 {
+    margin-bottom: 10px;
+}
+
+.image-info {
+    background: rgba(255,255,255,0.1);
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+    backdrop-filter: blur(10px);
+}
+
+/* Visualization */
+.visualization {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.visualization h3 {
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.visualization p {
+    color: #666;
+    margin-bottom: 20px;
+}
+
+.visualization img {
+    max-width: 100%;
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.visualization img:hover {
+    transform: scale(1.02);
+}
+
+/* Palette Cards Grid */
+.palette-details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+    gap: 25px;
+    margin-top: 30px;
+}
+
+.palette-card {
+    background: white;
+    border: 1px solid #eee;
+    border-radius: 15px;
+    padding: 25px;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+}
+
+.palette-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+}
+
+.palette-title {
+    font-size: 1.3em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+    display: flex;
+    align-items: center;
+}
+
+.palette-title::before {
+    content: "🔬";
+    margin-right: 10px;
+    font-size: 1.2em;
+}
+
+.method-description {
+    font-size: 0.85em;
+    color: #666;
+    margin-bottom: 20px;
+    font-style: italic;
+    line-height: 1.4;
+    padding: 10px;
+    background: #f8f9fa;
+    border-radius: 8px;
+    border-left: 4px solid #667eea;
+}
+
+/* Color List */
+.color-list {
+    list-style: none;
+}
+
+.color-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s ease;
+}
+
+.color-item:hover {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.color-item:last-child {
+    border-bottom: none;
+}
+
+.color-swatch {
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    margin-right: 15px;
+    border: 3px solid white;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transition: transform 0.2s ease;
+}
+
+.color-swatch:hover {
+    transform: scale(1.1);
+}
+
+.color-info {
+    flex-grow: 1;
+}
+
+.color-hex {
+    font-weight: bold;
+    font-family: 'Courier New', monospace;
+    font-size: 1.1em;
+    color: #333;
+}
+
+.color-name {
+    color: #666;
+    font-size: 0.9em;
+    margin-top: 2px;
+    text-transform: capitalize;
+}
+
+.color-badges {
+    display: flex;
+    gap: 5px;
+    margin-top: 8px;
+}
+
+.badge {
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-size: 0.7em;
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge.pink {
+    background: linear-gradient(135deg, #ffe4e1 0%, #ffc0cb 100%);
+    color: #d63384;
+}
+
+.badge.gray {
+    background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+    color: #6c757d;
+}
+
+/* Copy Palette Sections */
+.copy-palette {
+    margin-top: 20px;
+    padding: 15px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    border-radius: 10px;
+    border: 1px solid #dee2e6;
+}
+
+.copy-palette label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 8px;
+    font-size: 0.9em;
+    color: #495057;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.copy-palette input {
+    width: 100%;
+    padding: 10px 12px;
+    border: 2px solid #ced4da;
+    border-radius: 8px;
+    font-family: 'Courier New', monospace;
+    font-size: 0.9em;
+    background: white;
+    transition: border-color 0.3s ease;
+}
+
+.copy-palette input:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.copy-palette input:hover {
+    border-color: #adb5bd;
+}
+
+/* Error Messages */
+.error {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+    padding: 15px;
+    border-radius: 10px;
+    margin-top: 20px;
+    display: none;
+    border-left: 4px solid #dc3545;
+}
+
+/* New Analysis Button */
+.new-analysis {
+    text-align: center;
+    margin-top: 40px;
+    padding-top: 30px;
+    border-top: 2px dashed #dee2e6;
+}
+
+.new-analysis button {
+    background: linear-gradient(135deg, #6c757d 0%, #5a6268 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 600;
+}
+
+.new-analysis button:hover {
+    background: linear-gradient(135deg, #5a6268 0%, #495057 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(108, 117, 125, 0.3);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+    .palette-details {
+        grid-template-columns: 1fr;
+    }
+    
+    .header h1 {
+        font-size: 2em;
+    }
+    
+    .content {
+        padding: 20px;
+    }
+    
+    .upload-area {
+        padding: 40px 15px;
+    }
+    
+    .upload-icon {
+        font-size: 3em;
+    }
+    
+    .color-swatch {
+        width: 40px;
+        height: 40px;
+    }
+}
+
+@media (max-width: 480px) {
+    .header {
+        padding: 20px;
+    }
+    
+    .header h1 {
+        font-size: 1.8em;
+    }
+    
+    .content {
+        padding: 15px;
+    }
+    
+    .palette-card {
+        padding: 20px;
+    }
+}

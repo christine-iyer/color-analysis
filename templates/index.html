@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🎨 Color Palette Analyzer</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #ff7b7b 0%, #667eea 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .upload-section {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .upload-area {
+            border: 3px dashed #ddd;
+            border-radius: 15px;
+            padding: 60px 20px;
+            background: #fafafa;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #f0f7ff;
+        }
+        
+        .upload-area.dragover {
+            border-color: #ff7b7b;
+            background: #fff0f0;
+        }
+        
+        .upload-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+            color: #ccc;
+        }
+        
+        .upload-text {
+            font-size: 1.2em;
+            color: #666;
+            margin-bottom: 15px;
+        }
+        
+        .upload-subtext {
+            color: #999;
+            font-size: 0.9em;
+        }
+        
+        #imageInput {
+            display: none;
+        }
+        
+        .analyze-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 25px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .analyze-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(102, 126, 234, 0.3);
+        }
+        
+        .analyze-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .results {
+            display: none;
+        }
+        
+        .results-header {
+            background: linear-gradient(135deg, #b5cb92 0%, #667eea 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .image-info {
+            background: #23313f;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+        
+        .visualization {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .visualization img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .palette-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 25px;
+            margin-top: 30px;
+        }
+        
+        .palette-card {
+            background: white;
+            border: 1px solid #eee;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .palette-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+            display: flex;
+            align-items: center;
+        }
+        
+        .palette-title::before {
+            content: "🔬";
+            margin-right: 10px;
+        }
+        
+        .method-description {
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 15px;
+            font-style: italic;
+            line-height: 1.4;
+        }
+        
+        .color-list {
+            list-style: none;
+        }
+        
+        .color-item {
+            display: flex;
+            align-items: center;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .color-item:last-child {
+            border-bottom: none;
+        }
+        
+        .color-swatch {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            margin-right: 15px;
+            border: 2px solid white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        .color-info {
+            flex-grow: 1;
+        }
+        
+        .color-hex {
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+            font-size: 1.1em;
+        }
+        
+        .color-name {
+            color: #666;
+            font-size: 0.9em;
+            margin-top: 2px;
+        }
+        
+        .color-badges {
+            display: flex;
+            gap: 5px;
+            margin-top: 5px;
+        }
+        
+        .badge {
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.7em;
+            font-weight: bold;
+        }
+        
+        .badge.pink {
+            background: #ffe4e1;
+            color: #cda2b8;
+        }
+        
+        .badge.gray {
+            background: #e9ecef;
+            color: #6c757d;
+        }
+        
+        .copy-palette {
+            margin-top: 20px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #dee2e6;
+        }
+        
+        .copy-palette label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.9em;
+            color: #495057;
+        }
+        
+        .copy-palette input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ced4da;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            background: white;
+        }
+        
+        .error {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .new-analysis {
+            text-align: center;
+            margin-top: 40px;
+        }
+        
+        .new-analysis button {
+            background: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .new-analysis button:hover {
+            background: #5a6268;
+            transform: translateY(-1px);
+        }
+        
+        @media (max-width: 768px) {
+            .palette-details {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎨 Color Palette Analyzer</h1>
+            <p>Upload an image to extract beautiful color palettes with smart filtering</p>
+        </div>
+        
+        <div class="content">
+            <div class="upload-section" id="uploadSection">            <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+                <div class="upload-icon">📁</div>
+                <div class="upload-text">Click to select an image or drag & drop</div>
+                <div class="upload-subtext">Supports JPG, PNG, GIF, WebP (max 16MB) • 8 AI models will analyze your image</div>
+            </div>
+                <input type="file" id="imageInput" accept="image/*">
+                <button class="analyze-btn" id="analyzeBtn" onclick="analyzeImage()">
+                    � Analyze with 8 AI Models
+                </button>
+            </div>
+            
+            <div class="loading" id="loading">
+                <div class="spinner"></div>
+                <p>Analyzing your image using 8 different AI models and algorithms...</p>
+            </div>
+            
+            <div class="error" id="error"></div>
+            
+            <div class="results" id="results">
+                <div class="results-header">
+                    <h2>� Advanced Color Analysis Results</h2>
+                    <p>Your image has been analyzed using 8 different algorithms and models</p>
+                    <div class="image-info" id="imageInfo"></div>
+                </div>
+                
+                <div class="visualization">
+                    <h3>🖼️ Multi-Algorithm Comparison</h3>
+                    <p>All 8 methods compared side-by-side with your original image</p>
+                    <img id="visualizationImg" alt="Color palette comparison">
+                </div>
+                
+                <div class="palette-details" id="paletteDetails">
+                    <!-- Palette cards will be inserted here -->
+                </div>
+                
+                <div class="new-analysis">
+                    <button onclick="resetAnalysis()">🔄 Analyze Another Image</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let selectedFile = null;
+        
+        // File input handler
+        document.getElementById('imageInput').addEventListener('change', function(e) {
+            if (e.target.files[0]) {
+                selectedFile = e.target.files[0];
+                updateUploadArea();
+            }
+        });
+        
+        // Drag and drop handlers
+        const uploadArea = document.querySelector('.upload-area');
+        
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            
+            const files = e.dataTransfer.files;
+            if (files[0] && files[0].type.startsWith('image/')) {
+                selectedFile = files[0];
+                updateUploadArea();
+            }
+        });
+        
+        function updateUploadArea() {
+            if (selectedFile) {
+                document.querySelector('.upload-text').textContent = `Selected: ${selectedFile.name}`;
+                document.querySelector('.upload-subtext').textContent = `Size: ${(selectedFile.size / 1024 / 1024).toFixed(2)} MB`;
+                document.getElementById('analyzeBtn').style.display = 'inline-block';
+            }
+        }
+        
+        async function analyzeImage() {
+            if (!selectedFile) return;
+            
+            // Show loading
+            document.getElementById('uploadSection').style.display = 'none';
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            
+            const formData = new FormData();
+            formData.append('image', selectedFile);
+            
+            try {
+                const response = await fetch('/analyze', {
+                    method: 'POST',
+                    body: formData
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    displayResults(data);
+                } else {
+                    showError(data.error || 'Analysis failed');
+                }
+            } catch (error) {
+                showError('Network error: ' + error.message);
+            }
+            
+            document.getElementById('loading').style.display = 'none';
+        }
+        
+        function displayResults(data) {
+            // Update image info
+            document.getElementById('imageInfo').innerHTML = `
+                <strong>📄 File:</strong> ${data.image_info.filename} &nbsp;&nbsp;
+                <strong>📐 Size:</strong> ${data.image_info.size} &nbsp;&nbsp;
+                <strong>🎨 Mode:</strong> ${data.image_info.mode}
+            `;
+            
+            // Update visualization
+            document.getElementById('visualizationImg').src = data.visualization;
+            
+            // Create palette cards
+            const paletteDetails = document.getElementById('paletteDetails');
+            paletteDetails.innerHTML = '';
+            
+            Object.entries(data.palettes).forEach(([paletteName, colors]) => {
+                const description = data.method_descriptions ? data.method_descriptions[paletteName] : '';
+                const card = createPaletteCard(paletteName, colors, description);
+                paletteDetails.appendChild(card);
+            });
+            
+            document.getElementById('results').style.display = 'block';
+        }
+        
+        function createPaletteCard(name, colors, description) {
+            const card = document.createElement('div');
+            card.className = 'palette-card';
+            
+            const hexColors = colors.map(c => c.hex);
+            const cssColors = hexColors.join(' ');
+            const arrayColors = hexColors.map(h => `"${h}"`).join(', ');
+            
+            card.innerHTML = `
+                <div class="palette-title">${name}</div>
+                <div class="method-description">${description || ''}</div>
+                <ul class="color-list">
+                    ${colors.map(color => `
+                        <li class="color-item">
+                            <div class="color-swatch" style="background-color: ${color.hex}"></div>
+                            <div class="color-info">
+                                <div class="color-hex">${color.hex}</div>
+                                <div class="color-name">${color.name}</div>
+                                <div class="color-badges">
+                                    ${color.is_pink ? '<span class="badge pink">🌸 Pink</span>' : ''}
+                                    ${color.is_gray ? '<span class="badge gray">🔘 Gray</span>' : ''}
+                                </div>
+                            </div>
+                        </li>
+                    `).join('')}
+                </ul>
+                <div class="copy-palette">
+                    <label>CSS Colors:</label>
+                    <input type="text" value="${cssColors}" readonly onclick="this.select()">
+                </div>
+                <div class="copy-palette">
+                    <label>Array Format:</label>
+                    <input type="text" value="[${arrayColors}]" readonly onclick="this.select()">
+                </div>
+            `;
+            
+            return card;
+        }
+        
+        function showError(message) {
+            document.getElementById('error').textContent = message;
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('uploadSection').style.display = 'block';
+        }
+        
+        function resetAnalysis() {
+            selectedFile = null;
+            document.getElementById('uploadSection').style.display = 'block';
+            document.getElementById('results').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+            document.getElementById('analyzeBtn').style.display = 'none';
+            document.querySelector('.upload-text').textContent = 'Click to select an image or drag & drop';
+            document.querySelector('.upload-subtext').textContent = 'Supports JPG, PNG, GIF, WebP (max 16MB)';
+            document.getElementById('imageInput').value = '';
+        }
+    </script>
+</body>
+</html>

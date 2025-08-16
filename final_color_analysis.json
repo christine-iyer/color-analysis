@@ -1,0 +1,140 @@
+{
+  "image_info": {
+    "path": "image.jpg",
+    "size": [
+      801,
+      1029
+    ],
+    "mode": "RGB"
+  },
+  "analysis_results": {
+    "filtered_palette": [
+      {
+        "rgb": [
+          128,
+          96,
+          78
+        ],
+        "hex": "#80604e",
+        "name": "gray"
+      },
+      {
+        "rgb": [
+          162,
+          136,
+          60
+        ],
+        "hex": "#a2883c",
+        "name": "olive"
+      },
+      {
+        "rgb": [
+          193,
+          151,
+          154
+        ],
+        "hex": "#c1979a",
+        "name": "tan"
+      },
+      {
+        "rgb": [
+          215,
+          188,
+          78
+        ],
+        "hex": "#d7bc4e",
+        "name": "tan"
+      },
+      {
+        "rgb": [
+          147,
+          116,
+          21
+        ],
+        "hex": "#937415",
+        "name": "olive"
+      }
+    ],
+    "detected_pinks": [
+      {
+        "rgb": [
+          193,
+          160,
+          167
+        ],
+        "hex": "#c1a0a7",
+        "name": "tan"
+      },
+      {
+        "rgb": [
+          159,
+          139,
+          141
+        ],
+        "hex": "#9f8b8d",
+        "name": "gray"
+      },
+      {
+        "rgb": [
+          149,
+          99,
+          111
+        ],
+        "hex": "#95636f",
+        "name": "gray"
+      }
+    ],
+    "final_palette": [
+      {
+        "rgb": [
+          128,
+          96,
+          78
+        ],
+        "hex": "#80604e",
+        "name": "gray",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          162,
+          136,
+          60
+        ],
+        "hex": "#a2883c",
+        "name": "olive",
+        "is_pink": false
+      },
+      {
+        "rgb": [
+          193,
+          151,
+          154
+        ],
+        "hex": "#c1979a",
+        "name": "tan",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          215,
+          188,
+          78
+        ],
+        "hex": "#d7bc4e",
+        "name": "tan",
+        "is_pink": false
+      },
+      {
+        "rgb": [
+          147,
+          116,
+          21
+        ],
+        "hex": "#937415",
+        "name": "olive",
+        "is_pink": false
+      }
+    ]
+  }
+}

@@ -1,0 +1,168 @@
+{
+  "image_info": {
+    "path": "image.jpg",
+    "size": [
+      801,
+      1029
+    ],
+    "mode": "RGB"
+  },
+  "analysis_results": {
+    "original_palette": [
+      {
+        "rgb": [
+          215,
+          184,
+          59
+        ],
+        "hex": "#d7b83b",
+        "name": "coral",
+        "is_grayscale": false
+      },
+      {
+        "rgb": [
+          109,
+          99,
+          93
+        ],
+        "hex": "#6d635d",
+        "name": "gray",
+        "is_grayscale": true
+      },
+      {
+        "rgb": [
+          180,
+          161,
+          157
+        ],
+        "hex": "#b4a19d",
+        "name": "tan",
+        "is_grayscale": true
+      },
+      {
+        "rgb": [
+          159,
+          134,
+          62
+        ],
+        "hex": "#9f863e",
+        "name": "olive",
+        "is_grayscale": false
+      },
+      {
+        "rgb": [
+          45,
+          52,
+          46
+        ],
+        "hex": "#2d342e",
+        "name": "black",
+        "is_grayscale": true
+      }
+    ],
+    "enhanced_palette": [
+      {
+        "rgb": [
+          175,
+          164,
+          58
+        ],
+        "hex": "#afa43a",
+        "name": "olive",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          212,
+          194,
+          56
+        ],
+        "hex": "#d4c238",
+        "name": "gold",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          219,
+          198,
+          83
+        ],
+        "hex": "#dbc653",
+        "name": "tan",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          123,
+          93,
+          27
+        ],
+        "hex": "#7b5d1b",
+        "name": "olive",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          161,
+          132,
+          23
+        ],
+        "hex": "#a18417",
+        "name": "olive",
+        "is_pink": true
+      }
+    ],
+    "final_palette": [
+      {
+        "rgb": [
+          175,
+          164,
+          58
+        ],
+        "hex": "#afa43a",
+        "name": "olive",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          212,
+          194,
+          56
+        ],
+        "hex": "#d4c238",
+        "name": "gold",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          219,
+          198,
+          83
+        ],
+        "hex": "#dbc653",
+        "name": "tan",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          123,
+          93,
+          27
+        ],
+        "hex": "#7b5d1b",
+        "name": "olive",
+        "is_pink": true
+      },
+      {
+        "rgb": [
+          161,
+          132,
+          23
+        ],
+        "hex": "#a18417",
+        "name": "olive",
+        "is_pink": true
+      }
+    ]
+  }
+}
